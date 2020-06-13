@@ -1,0 +1,95 @@
+<html>
+	<head>
+		<title>THREE</title>
+		<style>
+			body { margin: 0; }
+			canvas { display: block; }
+		</style>
+	</head>
+	<body>
+		<script src="js/three.js"></script>
+		<script>
+			var scene = new THREE.Scene();
+			var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+			var renderer = new THREE.WebGLRenderer();
+			renderer.setPixelRatio(4*window.devicePixelRatio);//4*
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			document.body.appendChild( renderer.domElement );
+
+			var geometry1 = new THREE.BoxGeometry();
+			var geometry2 = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+			var material = new THREE.MeshLambertMaterial( { color: 0xffff00, opacity: 0.75, transparent: true } );//, opacity: 0.9, transparent: true
+			var cube = new THREE.Mesh( geometry1, material );
+			var material2 = new THREE.MeshLambertMaterial( { color: 0xffffff } );
+			var cube2 = new THREE.Mesh( geometry2, material2 );
+			circgeom = new THREE.CircleGeometry(3, 500);
+			circgeom.vertices.shift();
+			circgeom.computeLineDistances();
+			circgeom2 = new THREE.CircleGeometry(2, 500);
+			circgeom2.vertices.shift();
+			circgeom2.computeLineDistances();
+			var circle = new THREE.Line(circgeom, new THREE.LineBasicMaterial({color: 0xFF00FF, linecap: "round"}));
+			var circle2 = new THREE.Line(circgeom2, new THREE.LineBasicMaterial({color: 0xFFFF00, linecap: "round"}));
+			var circle3 = new THREE.Line(circgeom2, new THREE.LineBasicMaterial({color: 0xFFFF00, linecap: "round"}));
+			circle.rotation.set(Math.PI/2, 0, 0);
+			cube2.position.set(1, 1, 1);
+			scene.add(circle);
+			scene.add(circle2);
+			scene.add(circle3);
+			scene.add( cube );
+			scene.add(cube2);
+			camera.position.set(0, 3, 12);
+			var n = 0;
+			var v0 = new THREE.Vector3(0.001, 0, 0.002);
+			var veca = new THREE.Vector3();
+			var a = 0;
+			const GM = 0.1;
+			var color = 0xFFFFFF;
+			const intensity = 1;
+			const light = new THREE.DirectionalLight(color, intensity);
+			light.position.set(2, 30, 14);
+			scene.add(light);
+			var animate = function () {
+				requestAnimationFrame( animate );
+				cube.rotation.x += Math.pow(Math.cos(n), 2)/20;
+				cube.rotation.y += Math.pow(Math.cos(n), 2)/20;
+				cube.rotation.z += Math.pow(Math.cos(n), 2)/20;
+				cube.rotation.w += Math.pow(Math.sin(n), 2);
+				//cube.position.set(3*Math.cos(n), 0, 3*Math.sin(n));
+				cube2.rotation.x += Math.pow(Math.sin(n), 2)/20;
+				cube2.rotation.y += Math.pow(Math.sin(n), 2)/20;
+				cube2.rotation.z += Math.pow(Math.sin(n), 2)/20;
+				cube2.rotation.w += Math.pow(Math.sin(n), 2);
+				//cube2.position.set(2*Math.sin(n) + cube.position.x, 2*Math.cos(n) + cube.position.y, 2*Math.sin(Math.cos(n)) + cube.position.z);
+				cube2.position.add(v0);
+				if (cube2.position.distanceTo(cube.position) < 0.5){
+					if (Math.abs(a) > 1){a = -Math.pow(-a, 0.9);}
+					else if (Math.abs(a) === 1){a += 0.1;}
+					else{a = -Math.pow(-a, 1.1);}
+				}
+				else{
+					a = -GM/(60*Math.pow(cube2.position.distanceTo(cube.position), 3));
+				}
+				veca.addVectors(cube2.position, cube.position.negate());
+				v0.addScaledVector(veca, a);
+				//circle2.position.set(cube.position.x, cube.position.y, cube.position.z);
+				//circle2.rotation.set(2*Math.acos(Math.sin(n)), 2*Math.asin(Math.cos(n)), 2*n);
+				//circle3.position.set(cube.position.x, cube.position.y, cube.position.z);
+				//circle3.rotation.set(Math.acos(Math.sin(n)), Math.asin(Math.cos(n)), n);
+				//cube.material.color.setHex(255*(Math.pow(16, 4) + Math.pow(16, 2) + 1)*Math.abs(Math.cos(n)));
+				//cube2.material.color.setHex(255*(Math.pow(16, 4)*Math.abs(Math.cos(n)) + Math.pow(16, 2)*Math.abs(Math.sin(n)) + 1));
+				cube.scale.x = Math.pow(Math.cos(2*n), 2)*0.5 + 0.5;
+				cube.scale.y = Math.pow(Math.cos(2*n), 2)*0.5 + 0.5;
+				cube.scale.z = Math.pow(Math.cos(2*n), 2)*0.5 + 0.5;
+				cube2.scale.x = Math.pow(Math.sin(n/2), 2)*0.5 + 0.5;
+				cube2.scale.y = Math.pow(Math.sin(n/2), 2)*0.5 + 0.5;
+				cube2.scale.z = Math.pow(Math.sin(n/2), 2)*0.5 + 0.5;
+				n += 0.01;
+				n = n % 6.28;
+				renderer.render( scene, camera );
+			};
+			animate();
+		</script>
+	</body>
+</html>
